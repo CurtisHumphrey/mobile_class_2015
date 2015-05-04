@@ -1,0 +1,31 @@
+{
+  "name": "Mobile Apps Class",
+  "version": "1.0.0",
+  "homepage": "https://github.com/CurtisHumphrey/mobile_apps_template",
+  "authors": [
+    "Curtis M. Humphrey",
+    "Ph.D. <curtis@createdwithflair.com>"
+  ],
+  "description": "Mobile Apps Class",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "cordova": "~3.4.0",
+    "knockout-amd-helpers": "~0.7.3",
+    "requirejs-text": "~2.0.12",
+    "knockout": "~3.3.0",
+    "rjs": "~2.1.11",
+    "bootstrap": "~3.3.4"
+  },
+  "resolutions": {
+    "knockout-amd-helpers": "~0.7.3",
+    "knockout": "~3.3.0",
+    "bootstrap": "~3.3.4"
+  }
+}
