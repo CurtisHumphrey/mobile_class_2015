@@ -244,18 +244,18 @@
 	"buffers":
 	[
 		{
-			"file": "README.md",
+			"file": "code/coffee/controllers/main.coffee",
 			"settings":
 			{
-				"buffer_size": 55,
+				"buffer_size": 1030,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Gruntfile.coffee",
+			"file": "ko_templates/first_page.html",
 			"settings":
 			{
-				"buffer_size": 1521,
+				"buffer_size": 1013,
 				"line_ending": "Unix"
 			}
 		}
@@ -567,13 +567,24 @@
 	"expanded_folders":
 	[
 		"/C/code/ma_05/mobile_class_2015",
+		"/C/code/ma_05/mobile_class_2015/bower_components",
+		"/C/code/ma_05/mobile_class_2015/code",
 		"/C/code/ma_05/mobile_class_2015/code/coffee",
 		"/C/code/ma_05/mobile_class_2015/code/coffee/controllers",
-		"/C/code/ma_05/mobile_class_2015/code/js",
-		"/C/code/ma_05/mobile_class_2015/code/js/controllers"
+		"/C/code/ma_05/mobile_class_2015/ko_templates",
+		"/C/code/ma_05/mobile_class_2015/style",
+		"/C/code/ma_05/mobile_class_2015/style/parts"
 	],
 	"file_history":
 	[
+		"/C/code/ma_05/mobile_class_2015/README.md",
+		"/C/code/ma_05/mobile_class_2015/package.json",
+		"/C/code/ma_05/mobile_class_2015/code/coffee/app.coffee",
+		"/C/code/ma_05/mobile_class_2015/Gruntfile.coffee",
+		"/C/code/ma_05/mobile_class_2014/package.json",
+		"/C/code/ma_05/mobile_class_2015/style/app.css.map",
+		"/C/Dropbox/TedChef_dev/website/html/Gruntfile.coffee",
+		"/C/code/ma_05/mobile_class_2015/coffeelint.json",
 		"/C/Dropbox/TedChef_dev/website/ci_application/controllers/recipes.php",
 		"/C/Dropbox/TedChef_dev/website/html/dev/views/recipe/pickers/browser.html",
 		"/C/Dropbox/TedChef_dev/website/html/dev/views/recipe/pickers/picker_new_items.html",
@@ -656,7 +667,6 @@
 		"/C/Dropbox/TedChef_dev/website/html/app/views/pages/ui_components.html",
 		"/C/Dropbox/TedChef_dev/website/html/app/code/pages/ui_components.js",
 		"/C/Dropbox/TedChef_dev/website/html/dev/views/pages/ui_components.html",
-		"/C/Dropbox/TedChef_dev/website/html/Gruntfile.coffee",
 		"/C/Users/Humphrey/AppData/Roaming/Sublime Text 3/Packages/HTML-CSS-JS Prettify/HTMLPrettify.sublime-settings",
 		"/C/Users/Humphrey/AppData/Roaming/Sublime Text 3/Packages/HTML-CSS-JS Prettify/.jsbeautifyrc",
 		"/C/Dropbox/TedChef_dev/website/html/dev/code/pages/ui_components.coffee",
@@ -694,14 +704,7 @@
 		"/C/Dropbox/TedChef_dev/website/html/dev/code/recipe/pickers/action_until_vm.coffee",
 		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_common.php",
 		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_item.php",
-		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_repeater.php",
-		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker.php",
-		"/C/Dropbox/TedChef_dev/website/html/app/views/recipe/pickers/picker_new_items.html",
-		"/C/Dropbox/TedChef_dev/website/html/app/views/recipe/pickers/picker_more_amounts.html",
-		"/C/Dropbox/TedChef_dev/website/html/app/views/recipe/pickers/picker_amount.html",
-		"/C/Dropbox/TedChef_dev/website/html/package.json",
-		"/C/Dropbox/TedChef_dev/website/html/dev/code/services/http_service.coffee",
-		"/C/Dropbox/TedChef_dev/website/html/dev/code/recipe/parts/step_vm.coffee"
+		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_repeater.php"
 	],
 	"find":
 	{
@@ -744,6 +747,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"\"~",
 			"third_party",
 			"keymage",
 			"</label>",
@@ -870,8 +874,7 @@
 			"common_picker",
 			"vms",
 			"views",
-			"pickers",
-			"coaction_picker"
+			"pickers"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -895,24 +898,24 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "README.md",
+					"file": "code/coffee/controllers/main.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 55,
+						"buffer_size": 1030,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								55,
-								55
+								184,
+								70
 							]
 						],
 						"settings":
@@ -928,30 +931,36 @@
 									"selector": "text.html"
 								}
 							],
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
 				{
 					"buffer": 1,
-					"file": "Gruntfile.coffee",
-					"semi_transient": true,
+					"file": "ko_templates/first_page.html",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1521,
+						"buffer_size": 1013,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								708,
-								708
+								1013,
+								1013
 							]
 						],
 						"settings":
@@ -967,7 +976,7 @@
 									"selector": "text.html"
 								}
 							],
-							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage",
+							"syntax": "Packages/HTML/HTML.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
@@ -975,7 +984,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -998,11 +1007,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.331280788177,
 			1.0
 		],
 		"rows":
@@ -1585,7 +1601,7 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 234.0,
 	"status_bar_visible": true,
 	"template_settings":
