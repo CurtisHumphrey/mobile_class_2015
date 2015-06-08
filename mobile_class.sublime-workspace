@@ -244,7 +244,31 @@
 	"buffers":
 	[
 		{
-			"file": "code/coffee/controllers/main.coffee",
+			"file": "Gruntfile.coffee",
+			"settings":
+			{
+				"buffer_size": 1653,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 728,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "code/coffee/main.coffee",
+			"settings":
+			{
+				"buffer_size": 336,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "code/coffee/settings.coffee",
 			"settings":
 			{
 				"buffer_size": 1030,
@@ -252,11 +276,86 @@
 			}
 		},
 		{
-			"file": "ko_templates/first_page.html",
+			"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/MOCUPropertyInterface.h",
+			"settings":
+			{
+				"buffer_size": 2954,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/RavenInterface.cpp",
+			"settings":
+			{
+				"buffer_size": 51489,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/build/PersistentData/TOGAGPS/TOGAGPS.xml",
+			"settings":
+			{
+				"buffer_size": 304,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/build/PersistentData/Raven/Simulation/input.xml",
+			"settings":
+			{
+				"buffer_size": 15919,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "ko_templates/settings.html",
 			"settings":
 			{
 				"buffer_size": 1013,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#include \"MOCUPropertyInterface.h\"\n\ntemplate <typename A>\nMOCUPropertyInterface<A>::MOCUPropertyInterface(QString name, A defaultValue, IDSInterfacePtr dsInterface)\n    : MOCUPropertyInterface(name, defaultValue, true, dsInterface)\n{\n}\ntemplate <typename A>\nMOCUPropertyInterface<A>::MOCUPropertyInterface(QString name, A defaultValue, bool setEnabled, IDSInterfacePtr dsInterface)\n    : m_dsInterface(dsInterface)\n    , m_guid(NO_GUID)\n    , m_cachedValue(defaultValue)\n    , m_propertyName(name)\n    , m_setEnabled(setEnabled)\n    , m_disableSameValueChecks(false)\n{\n}\ntemplate <typename A>\nMOCUPropertyInterface<A>::MOCUPropertyInterface(A defaultValue)\n    : MOCUPropertyInterface(QString(), defaultValue, true, NULL)\n{\n}\ntemplate <typename A>\nMOCUPropertyInterface<A>::MOCUPropertyInterface()\n    : m_guid(NO_GUID)\n    , m_setEnabled(true)\n    , m_dsInterface(NULL)\n{\n    AssignDefault(m_cachedValue);\n}\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::SetGUID(OBJECT_GUID guid)\n{\n    if(guid == m_guid) return; //nothing to change\n\n    LOG_FUNC_TRACE();\n    boost::mutex::scoped_lock lock(m_mutex); //for set\n\n    m_guid = guid;\n}\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::SetDisableSameValueChecks(bool state)\n{\n    LOG_FUNC_TRACE();\n    boost::mutex::scoped_lock lock(m_mutex); //for set\n\n    m_disableSameValueChecks = state;\n}\n\ntemplate <typename A>\nbool MOCUPropertyInterface<A>::Set(A value)\n{\n    if(!m_setEnabled)\n    {\n        printf(\"Attempting to set a MOCUPropertyInterface when disabled for %s\\n\", m_propertyName.toStdString().c_str());\n        return false; //don't allow changes\n    }\n    LOG_FUNC_TRACE();\n    boost::mutex::scoped_lock lock(m_mutex);\n\n    A current = m_cachedValue;\n    OBJECT_GUID guid = m_guid;\n\n    lock.unlock();\n\n    if((current != value || m_disableSameValueChecks) && m_dsInterface != NULL)\n    {\n        if(guid != NO_GUID)\n        {\n            SetProperty(guid, value);\n            return true;\n        }\n        else\n        {\n            printf(\"Attempting to set a MOCUPropertyInterface without a guid set for %s\\n\", m_propertyName.toStdString().c_str());\n            return false;\n        }\n    }\n    else if(m_dsInterface == NULL)\n    {\n        return UpdateAndNotify(value);\n    }\n\n    return false;\n}\n\ntemplate <typename A>\nA MOCUPropertyInterface<A>::Get()\n{\n    LOG_FUNC_TRACE();\n    boost::mutex::scoped_lock lock(m_mutex);\n    return m_cachedValue;\n}\n\ntemplate <typename A>\nEventSignal<> &MOCUPropertyInterface<A>::GetSignal()\n{\n    return m_signal;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::HandleChangeIfMe(const OBJECT_PROPERTY_VALUE *property)\n{\n    if(m_propertyName == property->lpszName && CheckPropertyType(property))\n    {\n        //Update and Notify\n        A newValue;\n        {\n            boost::mutex::scoped_lock lock(m_mutex);\n            PullValue(property, newValue);\n        }\n        UpdateAndNotify(newValue);\n    }\n}\n\ntemplate <typename A>\nbool MOCUPropertyInterface<A>::UpdateAndNotify(A newValue)\n{\n    //Update and Notify\n    bool changed = false;\n    {\n        boost::mutex::scoped_lock lock(m_mutex);\n        if (newValue != m_cachedValue)\n        {\n            m_cachedValue = newValue;\n            changed = true;\n        }\n    }\n\n    if (changed || m_disableSameValueChecks)\n    {\n        m_signal.Notify();\n        return true;\n    }\n\n    return false;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::SetProperty(OBJECT_GUID guid, int value)\n{\n    m_dsInterface->SetPropertyInt(guid, m_propertyName.toStdString(), value);\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::SetProperty(OBJECT_GUID guid, double value)\n{\n    m_dsInterface->SetPropertyDouble(guid, m_propertyName.toStdString(), value);\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::SetProperty(OBJECT_GUID guid, bool value)\n{\n    m_dsInterface->SetPropertyBool(guid, m_propertyName.toStdString(), value);\n}\n\ntemplate <typename A>\nbool MOCUPropertyInterface<A>::CheckPropertyType(const OBJECT_PROPERTY_VALUE *property, int)\n{\n    return property->eType == OBJECT_PROPERTY_TYPE_INT;\n}\n\ntemplate <typename A>\nbool MOCUPropertyInterface<A>::CheckPropertyType(const OBJECT_PROPERTY_VALUE *property, double)\n{\n    return property->eType == OBJECT_PROPERTY_TYPE_DOUBLE;\n}\n\ntemplate <typename A>\nbool MOCUPropertyInterface<A>::CheckPropertyType(const OBJECT_PROPERTY_VALUE *property, bool)\n{\n    return property->eType == OBJECT_PROPERTY_TYPE_BOOL;\n}\n\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::PullValue(const OBJECT_PROPERTY_VALUE *property, int &value)\n{\n    value = property->nValue;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::PullValue(const OBJECT_PROPERTY_VALUE *property, double &value)\n{\n    value = property->dValue;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::PullValue(const OBJECT_PROPERTY_VALUE *property, bool &value)\n{\n    value = property->bValue;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::AssignDefault(int &value)\n{\n    value = 0;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::AssignDefault(double &value)\n{\n    value = 0.0;\n}\n\ntemplate <typename A>\nvoid MOCUPropertyInterface<A>::AssignDefault(bool &value)\n{\n    value = false;\n}",
+			"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/MOCUPropertyInterface.cpp",
+			"file_size": 5417,
+			"file_write_time": 130778207743422349,
+			"settings":
+			{
+				"buffer_size": 5208,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/RavenInterface.h",
+			"settings":
+			{
+				"buffer_size": 17035,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "code/coffee/timers.coffee",
+			"settings":
+			{
+				"buffer_size": 254,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "ko_templates/main.html",
+			"settings":
+			{
+				"buffer_size": 202,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "ko_templates/timers.html",
+			"settings":
+			{
+				"buffer_size": 449,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -267,16 +366,24 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 58.0,
-		"last_filter": "",
+		"height": 392.0,
+		"last_filter": "pret",
 		"selected_items":
 		[
 			[
-				"prett",
+				"pret",
 				"HTMLPrettify"
 			],
 			[
-				"pret",
+				"conv",
+				"Indentation: Convert to Spaces"
+			],
+			[
+				"upcase",
+				"Convert Case: Upper Case"
+			],
+			[
+				"prett",
 				"HTMLPrettify"
 			],
 			[
@@ -544,7 +651,7 @@
 				"Package Control: Discover Packages"
 			]
 		],
-		"width": 528.0
+		"width": 513.0
 	},
 	"console":
 	{
@@ -566,17 +673,27 @@
 	},
 	"expanded_folders":
 	[
-		"/C/code/ma_05/mobile_class_2015",
-		"/C/code/ma_05/mobile_class_2015/bower_components",
-		"/C/code/ma_05/mobile_class_2015/code",
-		"/C/code/ma_05/mobile_class_2015/code/coffee",
-		"/C/code/ma_05/mobile_class_2015/code/coffee/controllers",
-		"/C/code/ma_05/mobile_class_2015/ko_templates",
-		"/C/code/ma_05/mobile_class_2015/style",
-		"/C/code/ma_05/mobile_class_2015/style/parts"
+		"/C/code/mobile_class05/class_05",
+		"/C/code/mobile_class05/class_05/code",
+		"/C/code/mobile_class05/class_05/code/coffee",
+		"/C/code/mobile_class05/class_05/code/coffee/controllers",
+		"/C/code/mobile_class05/class_05/code/js",
+		"/C/code/mobile_class05/class_05/ko_templates"
 	],
 	"file_history":
 	[
+		"/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/MOCUWindowWidget.cpp",
+		"/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/MOCUWindowWidget.h",
+		"/C/code/mobile_class05/class_05/code/coffee/app.coffee",
+		"/C/code/mobile_class05/class_05/ko_templates/settings.html",
+		"/C/code/mobile_class05/class_05/ko_templates/main.html",
+		"/C/code/mobile_class05/class_05/index.html",
+		"/S/jmcclanahan/warnings - decoded.txt",
+		"/C/code/mobile_class05/class_05/code/coffee/settings.coffee",
+		"/C/code/mobile_class05/class_05/code/coffee/main.coffee",
+		"/S/jmcclanahan/warnings - bytes.txt",
+		"/C/code/TOGA/TOGAGPS/branches/TOGAGPS-312/FACEGPS/FaceGpsUT/test_rockwell.cpp",
+		"/C/code/mobile_class05/class_05/code/js/controllers/main.js",
 		"/C/code/ma_05/mobile_class_2015/README.md",
 		"/C/code/ma_05/mobile_class_2015/package.json",
 		"/C/code/ma_05/mobile_class_2015/code/coffee/app.coffee",
@@ -692,19 +809,7 @@
 		"/C/Dropbox/TedChef_dev/website/html/bower_components/bootstrap3-timepicker/_config.yml",
 		"/C/Dropbox/TedChef_dev/website/html/bower_components/bootstrap-timepicker/_config.yml",
 		"/C/Dropbox/TedChef_dev/website/html/node_modules/grunt/lib/grunt/config.js",
-		"/C/Dropbox/TedChef_dev/website/ci_application/config/config.php",
-		"/C/Dropbox/TedChef_dev/website/ci_application/models/ComboName.php",
-		"/C/Dropbox/TedChef_dev/website/html/node_modules/time-grunt/time-grunt.js",
-		"/C/Dropbox/TedChef_dev/website/html/node_modules/grunt-contrib-less/node_modules/less/test/less/import/import-and-relative-paths-test.less",
-		"/C/Dropbox/TedChef_dev/website/html/node_modules/time-grunt/node_modules/chalk/node_modules/strip-ansi/index.js",
-		"/C/Dropbox/TedChef_dev/website/html/app/code/helpers/ko_extensions.js",
-		"/C/Dropbox/TedChef_dev/website/html/node_modules/mout/src/lang/kindOf.js",
-		"/C/Dropbox/TedChef_dev/website/html/node_modules/mout/lang/kindOf.js",
-		"/C/Dropbox/TedChef_dev/website/html/test/helpers/knockoutjs-matchers.coffee",
-		"/C/Dropbox/TedChef_dev/website/html/dev/code/recipe/pickers/action_until_vm.coffee",
-		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_common.php",
-		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_item.php",
-		"/C/Dropbox/TedChef_dev/website/ci_application/views/pages/recipes/_picker_repeater.php"
+		"/C/Dropbox/TedChef_dev/website/ci_application/config/config.php"
 	],
 	"find":
 	{
@@ -747,6 +852,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"SetCamMode",
+			"sm",
+			"md",
+			" ",
 			"\"~",
 			"third_party",
 			"keymage",
@@ -870,11 +979,7 @@
 			"model",
 			"view",
 			"compose",
-			"pickers/vms",
-			"common_picker",
-			"vms",
-			"views",
-			"pickers"
+			"pickers/vms"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -898,12 +1003,101 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 6,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "code/coffee/controllers/main.coffee",
+					"file": "Gruntfile.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1653,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								453,
+								453
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 728,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								728,
+								728
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML Extended/HTML-extended.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "code/coffee/main.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 336,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								336,
+								336
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "code/coffee/settings.coffee",
 					"semi_transient": false,
 					"settings":
 					{
@@ -914,24 +1108,103 @@
 						"selection":
 						[
 							[
-								184,
-								70
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_complete_triggers":
+							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 52.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/MOCUPropertyInterface.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2954,
+						"regions":
+						{
+						},
+						"selection":
+						[
 							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage"
+								2653,
+								2653
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 900.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/RavenInterface.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 51489,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								45432,
+								45432
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 20661.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/build/PersistentData/TOGAGPS/TOGAGPS.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 304,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								304,
+								304
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -947,8 +1220,38 @@
 			"sheets":
 			[
 				{
-					"buffer": 1,
-					"file": "ko_templates/first_page.html",
+					"buffer": 7,
+					"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/build/PersistentData/Raven/Simulation/input.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15919,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "ko_templates/settings.html",
 					"semi_transient": false,
 					"settings":
 					{
@@ -959,24 +1262,13 @@
 						"selection":
 						[
 							[
-								1013,
-								1013
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"syntax": "Packages/HTML Extended/HTML-extended.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
@@ -984,7 +1276,155 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/MOCUPropertyInterface.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5208,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5208,
+								5208
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2700.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/C/code/TOGA/TOGAAPP/TOGAPP-562/TOGAAPP/TOGAUtil/RavenInterface.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 17035,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								613,
+								613
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4095.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "code/coffee/timers.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 254,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								168,
+								168
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"syntax": "Packages/Better CoffeeScript/CoffeeScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "ko_templates/main.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 202,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								191,
+								191
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"syntax": "Packages/HTML Extended/HTML-extended.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "ko_templates/timers.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 449,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								274,
+								304
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"open_with_edit": true,
+							"syntax": "Packages/HTML Extended/HTML-extended.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
 					"type": "text"
 				}
 			]
@@ -1018,7 +1458,7 @@
 		"cols":
 		[
 			0.0,
-			0.331280788177,
+			0.516854293745,
 			1.0
 		],
 		"rows":
@@ -1052,7 +1492,7 @@
 	"project": "mobile_class.sublime-project",
 	"replace":
 	{
-		"height": 62.0
+		"height": 42.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1061,6 +1501,10 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"main.js",
+				"code\\js\\controllers\\main.js"
+			],
 			[
 				"ui_",
 				"html\\dev\\views\\pages\\ui_components.html"
@@ -1568,10 +2012,6 @@
 			[
 				"stepjs",
 				"ux_app/code/js/recipe/step_vm.js"
-			],
-			[
-				"aler",
-				"ux_app/third_party/alertify/alertify.js"
 			]
 		],
 		"width": 0.0
@@ -1606,5 +2046,6 @@
 	"status_bar_visible": true,
 	"template_settings":
 	{
+		"max_columns": 1
 	}
 }
