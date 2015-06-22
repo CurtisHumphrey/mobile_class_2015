@@ -1,6 +1,6 @@
 (function() {
   define(function(require) {
-    var $, Main_VM, ToHMM, ko;
+    var $, Settings_VM, ToHMM, ko;
     ko = require('knockout');
     $ = require("jquery");
     ToHMM = function(minutes) {
@@ -12,8 +12,8 @@
       }
       return "" + h + ":" + m;
     };
-    return Main_VM = (function() {
-      function Main_VM() {
+    return Settings_VM = (function() {
+      function Settings_VM() {
         var i, j, k, minutes, options, ref, ref1;
         this.washer_options = ko.observableArray([]);
         this.dryer_options = ko.observableArray([]);
@@ -51,7 +51,7 @@
         return;
       }
 
-      return Main_VM;
+      return Settings_VM;
 
     })();
   });

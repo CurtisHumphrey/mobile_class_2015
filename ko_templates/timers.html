@@ -1,18 +1,16 @@
-<h2>Timers Page</h2>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-xs-4 col-xs-offset-1">
-      washer
+<h3>Timers</h3>
+<div class="container-fluid" id="timers">
+  <div class="row machines">
+    <div class="col-xs-4 col-xs-offset-1 machine washer">
     </div>
-    <div class="col-xs-4 col-xs-offset-2">
-      dryer
+    <div class="col-xs-4 col-xs-offset-2 machine dryer">
     </div>
   </div>
-  <div class="row">
-    <div class="col-xs-4 col-xs-offset-1" data-bind="text: washer_time">
+  <div class="row times">
+    <div class="col-xs-4 col-xs-offset-1 washer" data-bind="text: washer_time">
       loading...
     </div>
-    <div class="col-xs-4 col-xs-offset-2" data-bind="text: dryer_time">
+    <div class="col-xs-4 col-xs-offset-2 dryer" data-bind="text: dryer_time">
       loading...
     </div>
   </div>

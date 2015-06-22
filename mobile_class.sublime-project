@@ -2,8 +2,10 @@
 	"folders":
 	[
 		{
-			"follow_symlinks": true,
 			"path": "."
+		},
+		{
+			"path": "C:\\code\\mobile_class05\\mobile_class_2014"
 		}
 	]
 }
