@@ -21,7 +21,8 @@
     "requirejs-text": "~2.0.12",
     "knockout": "~3.3.0",
     "rjs": "~2.1.11",
-    "bootstrap": "~3.3.4"
+    "bootstrap": "~3.3.4",
+    "kox_lawnchair": "https://github.com/CurtisHumphrey/kox_lawnchair.git"
   },
   "resolutions": {
     "knockout-amd-helpers": "~0.7.3",
